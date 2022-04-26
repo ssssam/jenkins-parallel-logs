@@ -143,7 +143,7 @@ def extract_log_from_html(html):
     END_MARKER = "</pre>"
     pre_start = html.find(START_MARKER)
     pre_end = html[pre_start:].find(END_MARKER)
-    return html[pre_start + len(START_MARKER): pre_end]
+    return html[pre_start + len(START_MARKER): pre_start+pre_end]
 
 
 def filename_safe(s):
