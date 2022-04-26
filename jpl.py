@@ -19,9 +19,13 @@ def argument_parser():
     parser.add_argument('--debug', action='store_true')
     parser.add_argument('--only-icon-color', type=str, metavar="COLOR",
             help="Filter by icon color, e.g. 'red' to get only failed build steps")
-    parser.add_argument('job', type=str)
-    parser.add_argument('build', type=int)
-    parser.add_argument('outdir', type=str)
+
+    parser.add_argument('--job', metavar="PATH", type=str, required=True,
+            help="Job name or path.")
+    parser.add_argument('--build', metavar="NUMBER", type=int, required=True,
+            help="Build number.")
+    parser.add_argument('--outdir', metavar="DIR", type=str, required=True,
+            help="Directory to write log files. Must be empty, created if needed.")
     return parser
 
 
