@@ -86,6 +86,7 @@ class BuildStep:
         self.branch_name = branch_name
 
 
+FLOW_START_NODE_CLASS = 'org.jenkinsci.plugins.workflow.graph.FlowStartNode'
 STEP_NODE_TYPES = ['StepStartNode', 'StepAtomNode', 'StepEndNode']
 STEP_NODE_CLASSES = [
     'org.jenkinsci.plugins.workflow.cps.nodes.{}'.format(t)
@@ -101,7 +102,7 @@ def find_step_nodes(build_info):
 
     node_id_map = {}
     for node in nodes:
-        if node['_class'] in STEP_NODE_CLASSES:
+        if node['_class'] in STEP_NODE_CLASSES or node['_class'] == FLOW_START_NODE_CLASS:
             node_id = node['id']
             node_id_map[node_id] = node
     return node_id_map
