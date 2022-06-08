@@ -149,7 +149,7 @@ def extract_log_from_html(html):
 
 def filename_safe(s):
     valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
-    return ''.join(c if c in valid_chars else _ for c in s)
+    return ''.join(c if c in valid_chars else '_' for c in s)
 
 
 def directory_is_empty(path):
