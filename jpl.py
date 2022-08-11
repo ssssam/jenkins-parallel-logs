@@ -10,6 +10,7 @@ import sys
 import urllib.parse
 
 import requests
+from requests.auth import HTTPBasicAuth
 
 log = logging.getLogger()
 
@@ -38,22 +39,22 @@ def build_path(job_name, build_number):
     return '/'.join(parts) + '/'
 
 
-def fetch_build_info(jenkins_url, build_path):
+def fetch_build_info(jenkins_url, jenkins_auth, build_path):
     url = urllib.parse.urljoin(jenkins_url, build_path)
     url = urllib.parse.urljoin(url, 'api/json?depth=2')
     log.debug("Query: %s", url)
 
-    response = requests.get(url)
+    response = requests.get(url, auth=jenkins_auth)
     response.raise_for_status()
     return response.json()
 
 
-def fetch_step_html(jenkins_url, node_path):
+def fetch_step_html(jenkins_url, jenkins_auth, node_path):
     url = urllib.parse.urljoin(jenkins_url, node_path)
     url = urllib.parse.urljoin(url, "log")
     log.debug("Query: %s", url)
 
-    response = requests.get(url)
+    response = requests.get(url, auth=jenkins_auth)
     if response.status_code == 404:
         log.debug("No log file for %s", node_path)
     else:
@@ -171,13 +172,17 @@ def main():
         jenkins_url = os.environ['JENKINS_URL']
     except KeyError:
         raise RuntimeError("Please set JENKINS_URL");
+    try:
+        jenkins_auth = HTTPBasicAuth(*os.environ['JENKINS_AUTH'].split(':'))
+    except KeyError:
+        jenkins_auth = None
 
     outdir = pathlib.Path(args.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
     if not directory_is_empty(outdir):
         raise RuntimeError("Output directory {} is not empty.".format(outdir))
 
-    build_info = fetch_build_info(jenkins_url, build_path(args.job, args.build))
+    build_info = fetch_build_info(jenkins_url, jenkins_auth, build_path(args.job, args.build))
 
     build_info_path = outdir.joinpath('build_info.json')
     build_info_path.write_text(json.dumps(build_info))
@@ -187,7 +192,7 @@ def main():
 
     steps = list_build_steps(node_id_map, args.only_icon_color)
     for step in steps:
-        step_html = fetch_step_html(jenkins_url, step.url)
+        step_html = fetch_step_html(jenkins_url, jenkins_auth, step.url)
 
         if step_html:
             step_basename = filename_safe(
