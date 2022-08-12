@@ -5,8 +5,16 @@ log for each build step, which is necessary when 'parallel' or 'matrix' blocks a
 
 Example usage:
 
-     env JENKINS_URL='https://jenkins.example.com/'  python3 jpl.py \
-         --job 'my-test-job' --build 1 --outdir jenkins/ --only-icon-color red
+```shell
+env JENKINS_URL='https://jenkins.example.com/' python3 jpl.py \
+   --job 'my-test-job' --build 1 --outdir jenkins/ --only-icon-color red
+```
+
+If your Jenkins instance requires authentication:
+
+```shell
+export JENKINS_AUTH=username:password
+```
 
 Based on StackOverflow answer:
 
